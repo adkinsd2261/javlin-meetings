@@ -22,6 +22,15 @@ jobs:
           echo "UI SPEC: JAVLIN_MEETINGS_UI_SPEC.md"
           echo "TASKS: JAVLIN_MEETINGS_TASKS.md"
 
+      - name: Load specs into outputs
+        id: load
+        run: |
+          PROD=$(sed ':a;N;$!ba;s/\n/\\n/g' JAVLIN_MEETINGS_PRODUCT.md)
+          echo "product=$PROD" >> $GITHUB_OUTPUT
+
+
+
+
 
 
 
