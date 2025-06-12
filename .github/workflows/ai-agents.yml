@@ -13,7 +13,6 @@ on:
   workflow_dispatch:
 
 jobs:
-
   signal-audit:
     name: Signal → Spec Audit
     runs-on: ubuntu-latest
@@ -26,9 +25,9 @@ jobs:
           PRODUCT=$(sed ':a;N;$!ba;s/\n/\\n/g' JAVLIN_MEETINGS_PRODUCT.md)
           UI_SPEC=$(sed ':a;N;$!ba;s/\n/\\n/g' JAVLIN_MEETINGS_UI_SPEC.md)
           TASKS=$(sed ':a;N;$!ba;s/\n/\\n/g' JAVLIN_MEETINGS_TASKS.md)
-          echo "::set-output name=product::$PRODUCT"
-          echo "::set-output name=ui_spec::$UI_SPEC"
-          echo "::set-output name=tasks::$TASKS"
+          echo "product=$PRODUCT" >> $GITHUB_OUTPUT
+          echo "ui_spec=$UI_SPEC"   >> $GITHUB_OUTPUT
+          echo "tasks=$TASKS"       >> $GITHUB_OUTPUT
 
       - name: Signal-Meetings Audit
         id: signal
@@ -38,7 +37,7 @@ jobs:
           api-key: ${{ secrets.OPENAI_API_KEY }}
           temperature: 0
           messages: |
-            system: You are Signal, the product co‐founder and spec auditor for Javlin Meetings.
+            system: You are Signal, the product co-founder and spec auditor for Javlin Meetings.
             user: Audit these product docs for inconsistencies, missing details, and ambiguities. Provide bullet-point feedback and suggested fixes.
             --- PRODUCT ---
             ${{ steps.load_signal.outputs.product }}
@@ -69,9 +68,9 @@ jobs:
           UI_SPEC=$(sed ':a;N;$!ba;s/\n/\\n/g' JAVLIN_MEETINGS_UI_SPEC.md)
           IMPL=$(sed ':a;N;$!ba;s/\n/\\n/g' JAVLIN_MEETINGS_IMPLEMENTATION.md)
           SCAFFOLD=$(sed ':a;N;$!ba;s/\n/\\n/g' JAVLIN_MEETINGS_SCAFFOLD.md)
-          echo "::set-output name=ui_spec::$UI_SPEC"
-          echo "::set-output name=impl::$IMPL"
-          echo "::set-output name=scaffold::$SCAFFOLD"
+          echo "ui_spec=$UI_SPEC"     >> $GITHUB_OUTPUT
+          echo "impl=$IMPL"           >> $GITHUB_OUTPUT
+          echo "scaffold=$SCAFFOLD"   >> $GITHUB_OUTPUT
 
       - name: Forge-Meetings Scaffold
         id: forge
@@ -111,8 +110,8 @@ jobs:
         run: |
           BRAND=$(sed ':a;N;$!ba;s/\n/\\n/g' JAVLIN_MEETINGS_BRAND.md)
           CONTENT=$(sed ':a;N;$!ba;s/\n/\\n/g' JAVLIN_MEETINGS_CONTENT.md)
-          echo "::set-output name=brand::$BRAND"
-          echo "::set-output name=content::$CONTENT"
+          echo "brand=$BRAND"       >> $GITHUB_OUTPUT
+          echo "content=$CONTENT"   >> $GITHUB_OUTPUT
 
       - name: Marketing-Meetings Copy
         id: marketing
@@ -137,5 +136,6 @@ jobs:
           file_pattern: |
             marketing/**
             docs/landing-page.md
+
 
 
