@@ -59,3 +59,5 @@ ai_roles:
 - [ ] Export logos to `assets/logo/`  
 - [ ] Generate `color-palette-dark.png`  
 - [ ] Link Google Fonts for Inter  
+
+echo "<!-- trigger Marketing copy -->" >> JAVLIN_MEETINGS_BRAND.md
