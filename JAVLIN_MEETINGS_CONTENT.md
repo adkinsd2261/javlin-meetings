@@ -30,3 +30,5 @@ ai_roles:
 ## Social Posts
 - **Tweet:** "Never lose a meeting decision again—Javlin Meetings"  
 - **LinkedIn:** "Announcing Javlin Meetings: your AI meeting brain."
+
+"<!-- trigger all AI agents -->"
