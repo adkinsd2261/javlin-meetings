@@ -70,4 +70,4 @@ Capture meeting audio/video → transcribe → extract decisions & tasks → gra
 - Define error schemas & rate-limit headers  
 - Flesh out graph relationships
 
-echo "<!-- step1 -->" >>
+echo "<!-- step2 -->" >>
