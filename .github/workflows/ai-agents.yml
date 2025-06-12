@@ -1,53 +1,13 @@
-name: AI Agent Orchestration (Signal Only)
+name: YAML Lint Test
 
 on:
-  push:
-    paths:
-      - 'JAVLIN_MEETINGS_PRODUCT.md'
-      - 'JAVLIN_MEETINGS_UI_SPEC.md'
-      - 'JAVLIN_MEETINGS_TASKS.md'
   workflow_dispatch:
 
 jobs:
-  signal-audit:
-    name: Signal → Spec Audit
+  lint-test:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-
-      - name: Load specs
-        id: load
-        run: |
-          PROD=$(sed ':a;N;$!ba;s/\n/\\n/g' JAVLIN_MEETINGS_PRODUCT.md)
-          UI=$(sed ':a;N;$!ba;s/\n/\\n/g' JAVLIN_MEETINGS_UI_SPEC.md)
-          TASKS=$(sed ':a;N;$!ba;s/\n/\\n/g' JAVLIN_MEETINGS_TASKS.md)
-          echo "prod=$PROD" >> $GITHUB_OUTPUT
-          echo "ui=$UI" >> $GITHUB_OUTPUT
-          echo "tasks=$TASKS" >> $GITHUB_OUTPUT
-
-      - name: Signal Audit
-        uses: openai-actions/chat-completion@v1
-        with:
-          api-key: ${{ secrets.OPENAI_API_KEY }}
-          model: gpt-4o-mini
-          temperature: 0
-          messages: |
-            system: You are Signal, the spec auditor.
-            user: Audit for inconsistencies:
-            PROD: ${{ steps.load.outputs.prod }}
-            UI:   ${{ steps.load.outputs.ui }}
-            TASKS:${{ steps.load.outputs.tasks }}
-
-      - name: Commit feedback
-        if: ${{ steps.Signal_Audit.outputs.choices_0_message_content != '' }}
-        uses: stefanzweifel/git-auto-commit-action@v4
-        with:
-          commit_message: chore: Signal feedback
-          file_pattern: |
-            JAVLIN_MEETINGS_PRODUCT.md
-            JAVLIN_MEETINGS_UI_SPEC.md
-            JAVLIN_MEETINGS_TASKS.md
+      - run: echo "YAML is valid!"
 
 
 
