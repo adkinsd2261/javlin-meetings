@@ -61,3 +61,5 @@ ai_roles:
 - [ ] Link Google Fonts for Inter  
 
 echo "<!-- trigger Marketing copy -->" >> JAVLIN_MEETINGS_BRAND.md
+
+Add-Content .\JAVLIN_MEETINGS_BRAND.md "<!-- trigger all AI agents -->"
