@@ -1,0 +1,145 @@
+name: 🚀 AI Agent Orchestration
+
+on:
+  push:
+    paths:
+      - 'JAVLIN_MEETINGS_PRODUCT.md'
+      - 'JAVLIN_MEETINGS_UI_SPEC.md'
+      - 'JAVLIN_MEETINGS_TASKS.md'
+      - 'JAVLIN_MEETINGS_IMPLEMENTATION.md'
+      - 'JAVLIN_MEETINGS_SCAFFOLD.md'
+      - 'JAVLIN_MEETINGS_BRAND.md'
+      - 'JAVLIN_MEETINGS_CONTENT.md'
+  workflow_dispatch:
+
+jobs:
+  signal-audit:
+    name: Signal → Spec Audit
+    runs-on: ubuntu-latest
+    if: |
+      github.event_name == 'workflow_dispatch' ||
+      contains(github.event.head_commit.modified, 'JAVLIN_MEETINGS_PRODUCT.md') ||
+      contains(github.event.head_commit.modified, 'JAVLIN_MEETINGS_UI_SPEC.md') ||
+      contains(github.event.head_commit.modified, 'JAVLIN_MEETINGS_TASKS.md')
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Load Signal specs
+        id: load_signal
+        run: |
+          echo "::set-output name=product::$(sed ':a;N;$!ba;s/\n/\\n/g' JAVLIN_MEETINGS_PRODUCT.md)"
+          echo "::set-output name=ui_spec::$(sed ':a;N;$!ba;s/\n/\\n/g' JAVLIN_MEETINGS_UI_SPEC.md)"
+          echo "::set-output name=tasks::$(sed ':a;N;$!ba;s/\n/\\n/g' JAVLIN_MEETINGS_TASKS.md)"
+
+      - name: Signal-Meetings Audit
+        id: signal
+        uses: openai-actions/chat-completion@v1
+        with:
+          model: gpt-4o-mini
+          api-key: ${{ secrets.OPENAI_API_KEY }}
+          temperature: 0
+          messages: |
+            system: You are Signal, the product co‐founder and spec auditor for Javlin Meetings.
+            user: Audit these product docs for inconsistencies, missing details, and ambiguities. Provide bullet-point feedback and suggested fixes.
+            --- PRODUCT ---
+            ${{ steps.load_signal.outputs.product }}
+            --- UI SPEC ---
+            ${{ steps.load_signal.outputs.ui_spec }}
+            --- TASKS ---
+            ${{ steps.load_signal.outputs.tasks }}
+
+      - name: Commit Signal feedback
+        if: steps.signal.outputs.choices_0_message_content != ''
+        uses: stefanzweifel/git-auto-commit-action@v4
+        with:
+          commit_message: chore: Signal audit feedback
+          file_pattern: |
+            JAVLIN_MEETINGS_PRODUCT.md
+            JAVLIN_MEETINGS_UI_SPEC.md
+            JAVLIN_MEETINGS_TASKS.md
+
+  forge-scaffold:
+    name: Forge → Code Scaffold
+    runs-on: ubuntu-latest
+    if: |
+      github.event_name == 'workflow_dispatch' ||
+      contains(github.event.head_commit.modified, 'JAVLIN_MEETINGS_UI_SPEC.md') ||
+      contains(github.event.head_commit.modified, 'JAVLIN_MEETINGS_IMPLEMENTATION.md') ||
+      contains(github.event.head_commit.modified, 'JAVLIN_MEETINGS_SCAFFOLD.md')
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Load Forge specs
+        id: load_forge
+        run: |
+          echo "::set-output name=ui_spec::$(sed ':a;N;$!ba;s/\n/\\n/g' JAVLIN_MEETINGS_UI_SPEC.md)"
+          echo "::set-output name=impl::$(sed ':a;N;$!ba;s/\n/\\n/g' JAVLIN_MEETINGS_IMPLEMENTATION.md)"
+          echo "::set-output name=scaffold::$(sed ':a;N;$!ba;s/\n/\\n/g' JAVLIN_MEETINGS_SCAFFOLD.md)"
+
+      - name: Forge-Meetings Scaffold
+        id: forge
+        uses: openai-actions/chat-completion@v1
+        with:
+          model: gpt-4o-mini
+          api-key: ${{ secrets.OPENAI_API_KEY }}
+          temperature: 0
+          messages: |
+            system: You are Forge, the implementation engineer and scaffold generator.
+            user: Generate React component files and server routes based on these specs. Output directory structure and file contents as code blocks.
+            --- UI SPEC ---
+            ${{ steps.load_forge.outputs.ui_spec }}
+            --- IMPLEMENTATION ---
+            ${{ steps.load_forge.outputs.impl }}
+            --- SCAFFOLD ---
+            ${{ steps.load_forge.outputs.scaffold }}
+
+      - name: Commit Forge scaffolding
+        if: steps.forge.outputs.choices_0_message_content != ''
+        uses: stefanzweifel/git-auto-commit-action@v4
+        with:
+          commit_message: feat: Forge code scaffold
+          file_pattern: |
+            src/components/**
+            src/server/**
+            .github/workflows/ci.yml
+
+  marketing-copy:
+    name: Marketing → Copy & Campaigns
+    runs-on: ubuntu-latest
+    if: |
+      github.event_name == 'workflow_dispatch' ||
+      contains(github.event.head_commit.modified, 'JAVLIN_MEETINGS_BRAND.md') ||
+      contains(github.event.head_commit.modified, 'JAVLIN_MEETINGS_CONTENT.md')
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Load Marketing docs
+        id: load_marketing
+        run: |
+          echo "::set-output name=brand::$(sed ':a;N;$!ba;s/\n/\\n/g' JAVLIN_MEETINGS_BRAND.md)"
+          echo "::set-output name=content::$(sed ':a;N;$!ba;s/\n/\\n/g' JAVLIN_MEETINGS_CONTENT.md)"
+
+      - name: Marketing-Meetings Copy
+        id: marketing
+        uses: openai-actions/chat-completion@v1
+        with:
+          model: gpt-4o-mini
+          api-key: ${{ secrets.OPENAI_API_KEY }}
+          temperature: 0.7
+          messages: |
+            system: You are Marketing, the copywriter and launch strategist.
+            user: Using this brand kit and content calendar, draft homepage headlines, email sequences, and social posts.
+            --- BRAND KIT ---
+            ${{ steps.load_marketing.outputs.brand }}
+            --- CONTENT CALENDAR ---
+            ${{ steps.load_marketing.outputs.content }}
+
+      - name: Commit Marketing copy
+        if: steps.marketing.outputs.choices_0_message_content != ''
+        uses: stefanzweifel/git-auto-commit-action@v4
+        with:
+          commit_message: feat: Marketing copy drafts
+          file_pattern: |
+            marketing/
+            docs/landing-page.md
+
