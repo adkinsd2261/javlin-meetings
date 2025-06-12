@@ -1,13 +1,26 @@
-name: YAML Lint Test
+name: AI Agent Orchestration – Step 1
 
 on:
+  push:
+    paths:
+      - 'JAVLIN_MEETINGS_PRODUCT.md'
+      - 'JAVLIN_MEETINGS_UI_SPEC.md'
+      - 'JAVLIN_MEETINGS_TASKS.md'
   workflow_dispatch:
 
 jobs:
-  lint-test:
+  signal-audit:
+    name: Signal – Lint Specs
     runs-on: ubuntu-latest
     steps:
-      - run: echo "YAML is valid!"
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Echo file names
+        run: |
+          echo "PRODUCT: JAVLIN_MEETINGS_PRODUCT.md"
+          echo "UI SPEC: JAVLIN_MEETINGS_UI_SPEC.md"
+          echo "TASKS: JAVLIN_MEETINGS_TASKS.md"
 
 
 
