@@ -1,0 +1,7 @@
+@'
+{
+  "transcribe": [],
+  "extract": [],
+  "graph": []
+}
+'@ | Out-File -Encoding utf8 mock\db.json
